@@ -1,0 +1,245 @@
+<?php
+
+/**
+ * Implements hook_help().
+ */
+function site_pages_access_help($path, $arg) {
+	switch ($path) {
+		case 'admin/help#site_pages_access':
+			return check_markup(file_get_contents(dirname(__FILE__) . "/README.md"));
+	}
+}
+
+/**
+ * Implements hook_menu()
+ */
+function site_pages_access_menu() {
+	$items = [];
+	$items['admin/config/site_pages_access'] = array(
+		'title' => 'Site pages access',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('site_pages_access_admin'),
+		'access arguments' => array('administer site_pages_access_menus configuration'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+	return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function site_pages_access_permission() {
+	$items = [];
+	foreach (menu_get_menus() as $key => $value) {
+		$items['administer ' . $key . ' site_pages_access_menus configuration'] = array(
+			'title' => t('Site pages access ' . $value . '  menu')
+		);
+	}
+	return $items;
+}
+
+/**
+ * Implements hook_form().
+ */
+function site_pages_access_admin($form, &$form_state) {
+	$form = [];
+	$form['#tree'] = true;
+	
+	if (user_access('administer site configuration')) {
+		$form['site_pages_access_roles_allowed_bypass_access_verification'] = array(
+			'#type' => 'checkboxes',
+			'#title' => t('Roles allowed to bypass access verification'),
+			'#options' => array_filter(user_roles(), function ($val) { return ($val != 'administrator'); }),
+			'#default_value' => variable_get('site_pages_access_roles_allowed_bypass_access_verification', ''),
+		);
+	}
+	
+	$form['site_pages_access_menus'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Menus'),
+	);
+	
+	$menu_options = menu_get_menus();
+	
+	foreach ($menu_options as $key => $value) {
+		if (!user_access('administer ' . $key . ' site_pages_access_menus configuration')) {
+			unset($menu_options[$key]);
+		}
+	}
+	
+	$form['site_pages_access_menus']['menus'] = array(
+		'#title' => t('Choose an availible menus'),
+		'#type' => 'checkboxes',
+		'#options' => $menu_options,
+		'#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] : array_map(function () { return 0; }, $menu_options),
+	);
+	
+	foreach ($menu_options as $key => $value) {
+		
+		$tree = menu_tree_all_data($key);
+		$options = dfs_traverse_menu_tree_options($tree);
+		
+		if (count($options) > 0) {
+			
+			$form['site_pages_access_menus']['site_pages_access_menu_' . $key . '_items'] = array(
+				'#type' => 'fieldset',
+				'#title' => $value,
+				'#attributes' => array(
+					'class' => array('menu-wrapper menu'),
+					'id' => $key
+				)
+			);
+			
+			$form['site_pages_access_menus']['site_pages_access_menu_' . $key . '_items']['blocked_items'] = array(
+				'#type' => 'nested_checkboxes',
+				'#options' => $options,
+				'#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] : array_map(function () { return 0; }, $options),
+			);
+		}
+	}
+	
+	$form['#attached']['js'][] = array(
+		'data' => drupal_get_path('module', 'site_pages_access') . '/js/hide_show_menus.js',
+		'type' => 'file'
+	);
+	
+	$form['#attached']['css'][] = array(
+		'data' => '.menu-wrapper{ display: none}',
+		'type' => 'inline',
+	);
+	$form['#attached']['css'][] = array(
+		'data' => '.menu-wrapper.active{ display: block}',
+		'type' => 'inline',
+	);
+	
+	$form['#submit'][] = '_clear_menu_cache';
+	
+	return system_settings_form($form);
+}
+
+function _clear_menu_cache(&$form, &$form_state) {
+	cache_clear_all(NULL, 'cache_menu');
+}
+
+/**
+ * Builds a menu tree by depth first search recursive traversal
+ */
+function dfs_traverse_menu_tree_options($tree) {
+	$options = [];
+	foreach ($tree as $item) {
+		if (!$item['link']['hidden']) {
+			if (count($item['below']) == 0) {
+				$options[$item['link']['mlid']] = strip_tags($item['link']['link_title']);
+			}
+			else {
+				$options[$item['link']['mlid']]['#title'] = t(strip_tags($item['link']['link_title']));
+				$options[$item['link']['mlid']]['#options'] = dfs_traverse_menu_tree_options($item['below']);
+			}
+		}
+	}
+	return $options;
+}
+
+/**
+ * Implements hook_menu_get_item_alter().
+ * @param $router_item
+ * @param $path
+ * @param $original_map
+ */
+function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_map) {
+	
+	global $user;
+	
+	$bypass = false;
+	
+	if (in_array('administrator', $user->roles)) {
+		$bypass = TRUE;
+	}
+	else {
+		
+		$roles_allowed_bypass_access_verification = variable_get('site_pages_access_roles_allowed_bypass_access_verification', '');
+		if (is_array($roles_allowed_bypass_access_verification)) {
+			foreach ($user->roles as $rid => $name) {
+				if (in_array($rid, $roles_allowed_bypass_access_verification)) {
+					$bypass = true;
+				}
+			}
+		}
+		
+		$menus = variable_get('site_pages_access_menus', '')['menus'];
+		$menus_have_blocked_items = array_filter($menus, '_not_zero');
+		
+		$blocked_mlids = [];
+		foreach ($menus_have_blocked_items as $menu_have_blocked_items) {
+			
+			$items = variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $menu_have_blocked_items . '_items']['blocked_items'];
+			
+			$path_denied_arr = array_filter_recursive($items, '_not_zero');
+			
+			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($path_denied_arr));
+			foreach ($it as $v) {
+				$blocked_mlids[] = $v;
+			}
+			
+		}
+		
+		$blocked_pathes = db_select('menu_links', 'ml')
+			->fields('ml', array('link_path'))
+			->condition('mlid', $blocked_mlids, 'IN')
+			->execute()
+			->fetchCol();
+		
+		$curr_path = current_path();
+		$curr_path = $curr_path == variable_get('site_frontpage', '') ? '<front>' : $curr_path;
+		
+		if (in_array('administrator', $user->roles)) {
+			$bypass = true;
+		}
+		drupal_alter('site_pages_access_deny_validate', $bypass, $user);
+		
+		if ($bypass || !in_array($curr_path, $blocked_pathes)) {
+			$bypass = true;
+		}
+		
+	}
+	
+	if (!$bypass) {
+		$original_router_item_access_callback = $router_item['access_callback'];
+		$router_item['access_callback'] = '';
+		drupal_alter('site_pages_access_deny_callback', $router_item, $path, $original_map, $original_router_item_access_callback);
+	}
+	
+}
+
+function _not_zero($val) {
+	return ($val != '0' && $val != '0');
+}
+
+/**
+ * Recursive traversal over multidimensional array while dropping empty values an sub-arrays
+ * @param $array
+ * @param null $callback
+ * @return mixed
+ */
+function array_filter_recursive($array, $callback = null) {
+	foreach ($array as $key => & $value) {
+		if (is_array($value)) {
+			$value = array_filter_recursive($value, $callback);
+		}
+		else {
+			if (!is_null($callback)) {
+				if (!call_user_func($callback, $value)) {
+					unset($array[$key]);
+				}
+			}
+			else {
+				if (!(bool)$value) {
+					unset($array[$key]);
+				}
+			}
+		}
+	}
+	unset($value);
+	
+	return $array;
+}
