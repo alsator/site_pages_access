@@ -6,7 +6,7 @@
 function site_pages_access_help($path, $arg) {
 	switch ($path) {
 		case 'admin/help#site_pages_access':
-			return check_markup(file_get_contents(dirname(__FILE__) . "/README.md"));
+			return check_markup(file_get_contents(dirname(__FILE__) . "/README.txt"));
 	}
 }
 

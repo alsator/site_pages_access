@@ -1,14 +1,14 @@
-###SUMMARY
+-- SUMMARY --
 
 This module provides control on site page access
 
-###REQUIREMENTS 
+-- REQUIREMENTS --
 
 Nested checkbox
 jQuery Update (jQuery v1.6 or later)
 Libraries API
 
-###INSTALLATION
+-- INSTALLATION --
 
 To make this module work, you should download jQuery tristate checkbox plugin
 (http://jlbruno.github.io/jQuery-Tristate-Checkbox-plugin/) and extract it in
@@ -17,11 +17,11 @@ is libraries/tristate/jquery.tristate.min.js
 In jQuery Update settings, select jQuery v1.7 or 1.8
 Then install module as usual.
 
-###CONFIGURATION
+-- CONFIGURATION --
 
 Set permissions to allow some roles to configure access to some menus' items
 
-###CUSTOMIZATION
+-- CUSTOMIZATION --
 
 Policy of accessibility to blocked pages (administrator is allways availible):
 hook_site_pages_access_deny_validate_alter(&$bypass)
