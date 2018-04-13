@@ -99,7 +99,7 @@ function site_pages_access_admin($form, &$form_state) {
 	}
 	
 	$form['#attached']['js'][] = array(
-		'data' => drupal_get_path('module', 'site_pages_access') . '/js/hide_show_menus.js',
+		'data' => drupal_get_path('module', 'site_pages_access') . '/hide_show_menus.js',
 		'type' => 'file'
 	);
 	
