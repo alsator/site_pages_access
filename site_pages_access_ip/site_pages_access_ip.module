@@ -1,0 +1,48 @@
+<?php
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function site_pages_access_ip_form_site_pages_access_rules_alter(&$form, &$form_state, $form_id) {
+
+  $rules = variable_get('site_pages_access_rules', '');
+
+  $rules_types_options = array('role' => 'Role', 'ip' => 'IP');
+
+  for($i = 1; $i <= $form_state['num_rules']; $i++) {
+    $form['site_pages_access_rules'][$i]['rules'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Type'),
+      '#options' => $rules_types_options,
+      '#default_value' => is_array($rules) ? $rules[$i]['rules'] : array(),
+      '#states' => array(
+        'enabled' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+        ),
+        'disabled' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+        ),
+      )
+    );
+
+    $form['site_pages_access_rules'][$i]['ip'] = array(
+      '#type' => 'textfield',
+      '#title' => t('IP'),
+      '#default_value' => is_array($rules) ? $rules[$i]['ip'] : '',
+      '#states' => array(
+        'enabled' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+        ),
+        'disabled' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+        ),
+        'visible' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => true)
+        )
+      )
+    );
+  }
+
+
+}
