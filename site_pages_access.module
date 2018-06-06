@@ -73,7 +73,7 @@ function site_pages_access_permission() {
 /**
  * Implements hook_form().
  */
-/*function site_pages_access_rules($form, &$form_state) {
+function site_pages_access_rules($form, &$form_state) {
 
   $form['site_pages_access_rules'] = array(
     '#type' => 'fieldset',
@@ -169,272 +169,6 @@ function site_pages_access_permission() {
         )
       )
     );
-  }
-
-  $form['site_pages_access_rules']['add_rule'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add another rule'),
-    '#submit' => array('add_rule'),
-    '#ajax' => array(
-      'callback' => 'add_remove_rule_callback',
-      'wrapper' => 'site-page-access-rules-wrapper',
-    ),
-  );
-
-  if($form_state['num_rules'] > 1) {
-    $form['site_pages_access_rules']['remove_rule'] = array(
-      '#type' => 'submit',
-      '#value' => t('Remove latest rule'),
-      '#submit' => array('remove_rule'),
-      '#ajax' => array(
-        'callback' => 'add_remove_rule_callback',
-        'wrapper' => 'site-page-access-rules-wrapper',
-      ),
-    );
-  }
-
-  return system_settings_form($form);
-}*/
-
-
-/*function _get_rules_types() {
-  $rules_types['types'] = array(
-    'role' => 'select',
-  );
-  $rules_types['options'] = array(
-    'role' => 'Role',
-  );
-  $rules_types['type_options'] = array(
-    'role' => array_filter(user_roles(), function($val) { return ($val != 'administrator'); })
-  );
-
-  $rules_types['types']['ip'] = 'textfield';
-  $rules_types['options']['ip'] = 'IP';
-  $rules_types['type_options']['ip'] = '';
-
-
-//  drupal_alter('rules_types', $rules_types);
-
-//  $new_rules_types = module_invoke_all('rules_types', $rules_types);
-//  $rules_types = array_merge($rules_types, is_array($new_rules_types) ? $new_rules_types : array($new_rules_types));
-  return $rules_types;
-}
-
-function site_pages_access_rules($form, &$form_state) {
-
-  $form['site_pages_access_rules'] = array(
-    '#type' => 'fieldset',
-    '#tree' => true,
-    '#title' => t('Rules'),
-    "#prefix" => '<div id="site-page-access-rules-wrapper">',
-    "#suffix" => '</div>',
-  );
-
-  if(!isset($form_state['num_rules'])) {
-
-    $rules = variable_get('site_pages_access_rules', '');
-
-    if(($num_rules = count($rules)) > 1) {
-      $form_state['num_rules'] = $num_rules;
-    }
-    elseif(empty($form_state['num_rules'])) {
-      $form_state['num_rules'] = 1;
-    }
-
-  }
-
-  $rules_types = _get_rules_types();
-
-  for($i = 1; $i <= $form_state['num_rules']; $i++) {
-    $form['site_pages_access_rules'][$i] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Rule') . ' ' . $i,
-      '#collapsible' => true,
-    );
-    $form['site_pages_access_rules'][$i]['availibility'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enabled'),
-      '#default_value' => is_array($rules) ? $rules[$i]['availibility'] : true,
-    );
-    $form['site_pages_access_rules'][$i]['title'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Title'),
-      '#default_value' => is_array($rules) ? $rules[$i]['title'] : 'Rule ' . $i,
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-        ),
-        'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-        ),
-      )
-    );
-
-    $form['site_pages_access_rules'][$i]['rules'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Type'),
-      '#options' => $rules_types['options'],
-      '#default_value' => is_array($rules) ? $rules[$i]['rules'] : array(),
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-        ),
-        'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-        ),
-      )
-    );
-    foreach($rules_types['options'] as $rules_types_option_key => $rules_types_option) {
-      $form['site_pages_access_rules'][$i][$rules_types_option_key] = array(
-        '#type' => $rules_types['types'][$rules_types_option_key],
-        '#title' => t($rules_types_option),
-        '#options' => $rules_types['type_options'][$rules_types_option_key],
-        '#default_value' => is_array($rules) ? $rules[$i][$rules_types_option_key] : '',
-        '#states' => array(
-          'enabled' => array(
-            ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-          ),
-          'disabled' => array(
-            ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-          ),
-          'visible' => array(
-            ':input[name="site_pages_access_rules[' . $i . '][rules][' . $rules_types_option_key . ']"]' => array('checked' => true)
-          )
-        )
-      );
-    }
-  }
-
-  $form['site_pages_access_rules']['add_rule'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add another rule'),
-    '#submit' => array('add_rule'),
-    '#ajax' => array(
-      'callback' => 'add_remove_rule_callback',
-      'wrapper' => 'site-page-access-rules-wrapper',
-    ),
-  );
-
-  if($form_state['num_rules'] > 1) {
-    $form['site_pages_access_rules']['remove_rule'] = array(
-      '#type' => 'submit',
-      '#value' => t('Remove latest rule'),
-      '#submit' => array('remove_rule'),
-      '#ajax' => array(
-        'callback' => 'add_remove_rule_callback',
-        'wrapper' => 'site-page-access-rules-wrapper',
-      ),
-    );
-  }
-
-  return system_settings_form($form);
-}*/
-
-
-function site_pages_access_rules($form, &$form_state) {
-
-  $form['site_pages_access_rules'] = array(
-    '#type' => 'fieldset',
-    '#tree' => true,
-    '#title' => t('Rules'),
-    "#prefix" => '<div id="site-page-access-rules-wrapper">',
-    "#suffix" => '</div>',
-  );
-
-  if(!isset($form_state['num_rules'])) {
-
-    $rules = variable_get('site_pages_access_rules', '');
-
-    if(($num_rules = count($rules)) > 1) {
-      $form_state['num_rules'] = $num_rules;
-    }
-    elseif(empty($form_state['num_rules'])) {
-      $form_state['num_rules'] = 1;
-    }
-
-  }
-
-  $rules_types_options = array('role' => 'Role'/*, 'ip' => 'IP'*/);
-
-  for($i = 1; $i <= $form_state['num_rules']; $i++) {
-    $form['site_pages_access_rules'][$i] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Rule') . ' ' . $i,
-      '#collapsible' => true,
-    );
-    $form['site_pages_access_rules'][$i]['availibility'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enabled'),
-      '#default_value' => is_array($rules) ? $rules[$i]['availibility'] : true,
-    );
-    $form['site_pages_access_rules'][$i]['title'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Title'),
-      '#default_value' => is_array($rules) ? $rules[$i]['title'] : 'Rule ' . $i,
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-        ),
-        'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-        ),
-      )
-    );
-    $form['site_pages_access_rules'][$i]['rules'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Type'),
-      '#options' => $rules_types_options,
-      '#default_value' => is_array($rules) ? $rules[$i]['rules'] : array(),
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-        ),
-        'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-        ),
-      )
-    );
-    $form['site_pages_access_rules'][$i]['role'] = array(
-      '#type' => 'select',
-      '#title' => t('Role'),
-      '#options' => array_filter(user_roles(), function($val) { return ($val != 'administrator'); }),
-      '#default_value' => is_array($rules) ? $rules[$i]['role'] : '',
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-        ),
-        'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-        ),
-        'visible' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][rules][role]"]' => array('checked' => true)
-        )
-      )
-    );
-
-//    $form_rules = array(
-//      'form' => $form['site_pages_access_rules'][$i]['role'],
-//      'rules_types_options' => $rules_types_options,
-//    );
-//
-//    drupal_alter('site_pages_access_rules', $form_rules);
-
-//    $form['site_pages_access_rules'][$i]['ip'] = array(
-//      '#type' => 'textfield',
-//      '#title' => t('IP'),
-//      '#default_value' => is_array($rules) ? $rules[$i]['ip'] : '',
-//      '#states' => array(
-//        'enabled' => array(
-//          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-//        ),
-//        'disabled' => array(
-//          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-//        ),
-//        'visible' => array(
-//          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => true)
-//        )
-//      )
-//    );
   }
 
   $form['site_pages_access_rules']['add_rule'] = array(
@@ -690,8 +424,7 @@ function dfs_traverse_menu_tree_options($tree) {
 function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_map) {
 
   global $user;
-  $ip_address = '127.0.0.1';
-//  $ip_address = ip_address();
+  $ip_address = ip_address();
 
   $bypass = false;
 
@@ -723,10 +456,10 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
               case 'role':
                 $bypass_aggr[$rule_type] = key_exists($value, $user->roles);
                 break;
-//            case 'ip':
-//              $ip_to_arr = explode('-', $value);
-//              $bypass_aggr[$rule_type] = CheckIpRange($ip_address, $ip_to_arr[0], isset($ip_to_arr[1]) ? isset($ip_to_arr[1]) : $ip_to_arr[0]);
-//              break;
+              case 'ip':
+                $ip_to_arr = explode('-', $value);
+                $bypass_aggr[$rule_type] = CheckIpRange($ip_address, $ip_to_arr[0], isset($ip_to_arr[1]) ? isset($ip_to_arr[1]) : $ip_to_arr[0]);
+                break;
               default:
                 $bypass_aggr[$rule_type] = module_invoke('site_pages_access', 'rule_type');
             }
