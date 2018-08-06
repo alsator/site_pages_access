@@ -48,7 +48,7 @@ function site_pages_access_admin($form, &$form_state) {
 	if (user_access('administer site configuration')) {
 		$form['site_pages_access_roles_allowed_bypass_access_verification'] = array(
 			'#type' => 'checkboxes',
-			'#title' => t('Roles allowed to bypass access verification'),
+			'#title' => t('Roles allowed to access listed below blocked menu items'),
 			'#options' => array_filter(user_roles(), function ($val) { return ($val != 'administrator'); }),
 			'#default_value' => variable_get('site_pages_access_roles_allowed_bypass_access_verification', ''),
 		);
@@ -68,7 +68,7 @@ function site_pages_access_admin($form, &$form_state) {
 	}
 	
 	$form['site_pages_access_menus']['menus'] = array(
-		'#title' => t('Choose an availible menus'),
+		'#title' => t('Blocked menu items'),
 		'#type' => 'checkboxes',
 		'#options' => $menu_options,
 		'#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] : array_map(function () { return 0; }, $menu_options),
@@ -99,7 +99,7 @@ function site_pages_access_admin($form, &$form_state) {
 	}
 	
 	$form['#attached']['js'][] = array(
-		'data' => drupal_get_path('module', 'site_pages_access') . '/hide_show_menus.js',
+		'data' => drupal_get_path('module', 'site_pages_access') . '/js/hide_show_menus.js',
 		'type' => 'file'
 	);
 	
