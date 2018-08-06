@@ -153,10 +153,27 @@ function site_pages_access_rules($form, &$form_state) {
         )
       )
     );
+//    $form['site_pages_access_rules'][$i]['ip'] = array(
+//      '#type' => 'textfield',
+//      '#title' => t('IP'),
+//      '#default_value' => is_array($rules) ? $rules[$i]['ip'] : '',
+//      '#states' => array(
+//        'enabled' => array(
+//          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+//        ),
+//        'disabled' => array(
+//          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+//        ),
+//        'visible' => array(
+//          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => true)
+//        )
+//      )
+//    );
     $form['site_pages_access_rules'][$i]['ip'] = array(
-      '#type' => 'textfield',
+      '#type' => 'ipv4_address_form_element',
+//      '#type' => 'ipv4_address_range_form_element',
       '#title' => t('IP'),
-      '#default_value' => is_array($rules) ? $rules[$i]['ip'] : '',
+//      '#default_value' => is_array($rules) ? $rules[$i]['ip'] : '',
       '#states' => array(
         'enabled' => array(
           ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
