@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * Implements hook_rules_types_options_alter().
+ */
+function site_page_access_ip_rule_rules_types_options_alter(&$rules_types_options) {
+  $rules_types_options['ip'] = 'IP';
+}
+
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function site_page_access_ip_rule_form_site_pages_access_rules_alter(&$form, &$form_state, $form_id) {
+
+  $rules = variable_get('site_pages_access_rules', '');
+
+  for($i = 1; $i <= $form_state['num_rules']; $i++) {
+
+    $form['site_pages_access_rules'][$i]['ip'] = array(
+      '#type' => 'ipv4_address_range_field',
+      '#title' => t('IP Range'),
+      '#default_value' => is_array($rules) ? $rules[$i]['ip']['ip_range_start'] . ' - ' . $rules[$i]['ip']['ip_range_end'] : '',
+      '#states' => array(
+        'enabled' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+        ),
+        'disabled' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+        ),
+        'visible' => array(
+          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => true)
+        )
+      )
+    );
+  }
+}
+
+
+
+function CheckIpRange($ip, $min, $max) {
+  return (ip2long($min) <= ip2long($ip) && ip2long($ip) <= ip2long($max));
+}
+
+
+
+/**
+ * Implements hook_site_pages_access_rule_type_alter().
+ */
+function site_page_access_ip_rule_site_pages_access_rule_type_alter(&$bypass, $ip_range) {
+
+  $ip_address = ip_address();
+
+  $bypass =
+    CheckIpRange(
+      $ip_address,
+      $ip_range['ip_range_start'],
+      isset($ip_range['ip_range_end']) ? $ip_range['ip_range_end'] : $ip_range['ip_range_start']
+    );
+}

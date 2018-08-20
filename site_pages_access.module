@@ -4,6 +4,7 @@
  * Implements hook_help().
  */
 function site_pages_access_help($path, $arg) {
+
   switch($path) {
     case 'admin/help#site_pages_access':
       return check_markup(file_get_contents(dirname(__FILE__) . "/README.txt"));
@@ -16,6 +17,7 @@ function site_pages_access_help($path, $arg) {
  * Implements hook_menu()
  */
 function site_pages_access_menu() {
+
   $items = [];
   $items['admin/config/site_pages_access'] = array(
     'title' => 'Site pages access',
@@ -58,6 +60,7 @@ function site_pages_access_menu() {
  * Implements hook_permission().
  */
 function site_pages_access_permission() {
+
   $items = [];
   foreach(menu_get_menus() as $key => $value) {
     $items['administer ' . $key . ' site_pages_access_menus configuration'] = array(
@@ -120,7 +123,7 @@ function site_pages_access_rules($form, &$form_state) {
         ),
       )
     );
-    $rules_types_options = array('role' => 'Role', 'ip' => 'IP');
+    $rules_types_options = array('role' => 'Role');
     drupal_alter('rules_types_options', $rules_types_options);
     $form['site_pages_access_rules'][$i]['rules'] = array(
       '#type' => 'checkboxes',
@@ -150,39 +153,6 @@ function site_pages_access_rules($form, &$form_state) {
         ),
         'visible' => array(
           ':input[name="site_pages_access_rules[' . $i . '][rules][role]"]' => array('checked' => true)
-        )
-      )
-    );
-//    $form['site_pages_access_rules'][$i]['ip'] = array(
-//      '#type' => 'textfield',
-//      '#title' => t('IP'),
-//      '#default_value' => is_array($rules) ? $rules[$i]['ip'] : '',
-//      '#states' => array(
-//        'enabled' => array(
-//          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-//        ),
-//        'disabled' => array(
-//          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-//        ),
-//        'visible' => array(
-//          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => true)
-//        )
-//      )
-//    );
-    $form['site_pages_access_rules'][$i]['ip'] = array(
-      '#type' => 'ipv4_address_form_element',
-//      '#type' => 'ipv4_address_range_form_element',
-      '#title' => t('IP'),
-//      '#default_value' => is_array($rules) ? $rules[$i]['ip'] : '',
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
-        ),
-        'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
-        ),
-        'visible' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => true)
         )
       )
     );
@@ -216,6 +186,7 @@ function site_pages_access_rules($form, &$form_state) {
 
 
 function add_rule($form, &$form_state) {
+
   if(!isset($form_state['num_rules'])) {
     $form_state['num_rules'] = 0;
     $form_state['num_rules']++;
@@ -227,12 +198,14 @@ function add_rule($form, &$form_state) {
 
 
 function add_remove_rule_callback($form, $form_state) {
+
   return $form['site_pages_access_rules'];
 }
 
 
 
 function remove_rule($form, &$form_state) {
+
   if($form_state['num_rules'] > 1) {
     $form_state['num_rules']--;
   }
@@ -352,11 +325,11 @@ function site_pages_access_table_admin($form, &$form_state) {
       array_walk_recursive(
         $sliced_limited_access_pages,
         function($v, $k) use (&$flatern_limited_access_pages) {
+
           $flatern_limited_access_pages[] = $v;
         }
       );
 
-//      dpm($flatern_limited_access_pages);
       foreach($flatern_limited_access_pages as $mlid) {
         $link = menu_link_load($mlid);
 
@@ -405,6 +378,7 @@ function site_pages_access_table_admin($form, &$form_state) {
 
 
 function _clear_menu_cache(&$form, &$form_state) {
+
   cache_clear_all(null, 'cache_menu');
 }
 
@@ -414,6 +388,7 @@ function _clear_menu_cache(&$form, &$form_state) {
  * Builds a menu tree by depth first search recursive traversal
  */
 function dfs_traverse_menu_tree_options($tree) {
+
   $options = [];
   foreach($tree as $item) {
     if(!$item['link']['hidden']) {
@@ -441,7 +416,6 @@ function dfs_traverse_menu_tree_options($tree) {
 function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_map) {
 
   global $user;
-  $ip_address = ip_address();
 
   $bypass = false;
 
@@ -473,19 +447,14 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
               case 'role':
                 $bypass_aggr[$rule_type] = key_exists($value, $user->roles);
                 break;
-              case 'ip':
-                $ip_to_arr = explode('-', $value);
-                $bypass_aggr[$rule_type] = CheckIpRange($ip_address, $ip_to_arr[0], isset($ip_to_arr[1]) ? isset($ip_to_arr[1]) : $ip_to_arr[0]);
-                break;
               default:
-                $bypass_aggr[$rule_type] = module_invoke('site_pages_access', 'rule_type');
+                drupal_alter('site_pages_access_rule_type', $bypass_aggr[$rule_type], $value);
             }
           }
 
         }
 
         if(count(array_unique($bypass_aggr)) === 1) {
-          error_log(print_r($bypass_aggr, true));
           $bypass = true;
         }
 
@@ -508,19 +477,15 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
 
 
-function CheckIpRange($ip, $min, $max) {
-  return (ip2long($min) <= ip2long($ip) && ip2long($ip) <= ip2long($max));
-}
-
-
-
 function _not_zero($val) {
+
   return ($val != '0' && $val != '0');
 }
 
 
 
 function _not_null($val) {
+
   return ($val != null && $val != null);
 }
 
@@ -533,6 +498,7 @@ function _not_null($val) {
  * @return mixed
  */
 function array_filter_recursive($array, $callback = null) {
+
   foreach($array as $key => & $value) {
     if(is_array($value)) {
       $value = array_filter_recursive($value, $callback);
@@ -558,6 +524,7 @@ function array_filter_recursive($array, $callback = null) {
 
 
 function _mlid_by_path($path) {
+
   return db_select('menu_links', 'ml')
     ->fields('ml', array('mlid'))
     ->condition('link_path', $path)
@@ -568,6 +535,7 @@ function _mlid_by_path($path) {
 
 
 function _verify_path_role_bypass($path, $role, $user = null) {
+
   $mlid = _mlid_by_path($path);
 }
 

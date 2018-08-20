@@ -1,0 +1,9 @@
+<?php
+
+function site_pages_access_uninstall() {
+  db_delete('variable')
+    ->condition('name', 'site_pages_access_%', 'LIKE')
+    ->execute();
+
+  cache_clear_all('variables', 'cache_bootstrap');
+}
