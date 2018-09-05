@@ -289,12 +289,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
 }
 
 /**
- * Form.
- *
- * @param $form
- * @param $form_state
- *
- * @return mixed
+ * Implements hook_form().
  */
 function site_pages_access_table_admin($form, &$form_state) {
 
@@ -401,10 +396,6 @@ function _clear_menu_cache(&$form, &$form_state) {
 
 /**
  * Builds a menu tree by depth first search recursive traversal.
- *
- * @param $tree
- *
- * @return array
  */
 function dfs_traverse_menu_tree_options($tree) {
 
@@ -426,10 +417,6 @@ function dfs_traverse_menu_tree_options($tree) {
 
 /**
  * Implements hook_menu_get_item_alter().
- *
- * @param $router_item
- * @param $path
- * @param $original_map
  */
 function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_map) {
 
@@ -469,7 +456,7 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
               default:
                 drupal_alter('site_pages_access_rule_type', $bypass_aggr[$rule_type], $value);
                 break;
-                
+
             }
           }
 
@@ -498,10 +485,6 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
 /**
  * Not zero.
- *
- * @param $val
- *
- * @return bool
  */
 function _not_zero($val) {
 
@@ -510,10 +493,6 @@ function _not_zero($val) {
 
 /**
  * Not null.
- *
- * @param $val
- *
- * @return bool
  */
 function _not_null($val) {
 
@@ -523,11 +502,6 @@ function _not_null($val) {
 /**
  * Recursive traversal over multidimensional array while dropping empty values
  * an sub-arrays.
- *
- * @param $array
- * @param null $callback
- *
- * @return mixed
  */
 function array_filter_recursive($array, $callback = NULL) {
 
@@ -542,7 +516,7 @@ function array_filter_recursive($array, $callback = NULL) {
         }
       }
       else {
-        if (!(bool)$value) {
+        if (!(bool) $value) {
           unset($array[$key]);
         }
       }
@@ -555,9 +529,6 @@ function array_filter_recursive($array, $callback = NULL) {
 
 /**
  * Update rules.
- *
- * @param $form
- * @param $form_state
  */
 function _update_bypass_link_rules_table($form, &$form_state) {
 
