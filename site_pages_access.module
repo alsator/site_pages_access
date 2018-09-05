@@ -243,9 +243,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
     '#type' => 'checkboxes',
     '#options' => $menu_options,
     '#default_value' =>
-      is_array(variable_get('site_pages_access_menus', '')) ?
-        variable_get('site_pages_access_menus', '')['menus'] :
-        array_map(function () { return 0; }, $menu_options),
+      is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] : array_map(function () { return 0; }, $menu_options),
   );
 
   foreach ($menu_options as $key => $value) {
@@ -268,9 +266,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
         '#type' => 'nested_checkboxes',
         '#options' => $options,
         '#default_value' =>
-          is_array(variable_get('site_pages_access_menus', '')) ?
-            variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] :
-            array_map(function () { return 0; }, $options),
+          is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] : array_map(function () { return 0; }, $options),
       );
     }
   }
