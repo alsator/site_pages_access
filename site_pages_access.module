@@ -242,10 +242,10 @@ function site_pages_access_menus_admin($form, &$form_state) {
     '#title' => t('Choose an availible menus'),
     '#type' => 'checkboxes',
     '#options' => $menu_options,
-    '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] :
-      array_map(
-        function () { return 0; }, $menu_options
-      ),
+    '#default_value' =>
+      is_array(variable_get('site_pages_access_menus', '')) ?
+        variable_get('site_pages_access_menus', '')['menus'] :
+        array_map(function () { return 0; }, $menu_options),
   );
 
   foreach ($menu_options as $key => $value) {
@@ -267,10 +267,10 @@ function site_pages_access_menus_admin($form, &$form_state) {
       $form['site_pages_access_menus']['site_pages_access_menu_' . $key . '_items']['blocked_items'] = array(
         '#type' => 'nested_checkboxes',
         '#options' => $options,
-        '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] :
-          array_map(
-            function () { return 0; }, $options
-          ),
+        '#default_value' =>
+          is_array(variable_get('site_pages_access_menus', '')) ?
+            variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] :
+            array_map(function () { return 0; }, $options),
       );
     }
   }
@@ -407,8 +407,7 @@ function dfs_traverse_menu_tree_options($tree) {
         $options[$item['link']['mlid']] = strip_tags($item['link']['link_title']);
       }
       else {
-        $title = strip_tags($item['link']['link_title']);
-        $options[$item['link']['mlid']]['#title'] = t($title);
+        $options[$item['link']['mlid']]['#title'] = t(strip_tags($item['link']['link_title']));
         $options[$item['link']['mlid']]['#options'] = dfs_traverse_menu_tree_options($item['below']);
       }
     }
