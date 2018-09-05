@@ -243,7 +243,9 @@ function site_pages_access_menus_admin($form, &$form_state) {
     '#type' => 'checkboxes',
     '#options' => $menu_options,
     '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] :
-      array_map(function () { return 0; }, $menu_options),
+      array_map(
+        function () { return 0; }, $menu_options
+      ),
   );
 
   foreach ($menu_options as $key => $value) {
@@ -266,7 +268,9 @@ function site_pages_access_menus_admin($form, &$form_state) {
         '#type' => 'nested_checkboxes',
         '#options' => $options,
         '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] :
-          array_map(function () { return 0; }, $options),
+          array_map(
+            function () { return 0; }, $options
+          ),
       );
     }
   }
@@ -385,9 +389,6 @@ function site_pages_access_table_admin($form, &$form_state) {
 
 /**
  * Clear cache.
- *
- * @param $form
- * @param $form_state
  */
 function _clear_menu_cache(&$form, &$form_state) {
 
@@ -406,7 +407,8 @@ function dfs_traverse_menu_tree_options($tree) {
         $options[$item['link']['mlid']] = strip_tags($item['link']['link_title']);
       }
       else {
-        $options[$item['link']['mlid']]['#title'] = t(strip_tags($item['link']['link_title']));
+        $title = strip_tags($item['link']['link_title']);
+        $options[$item['link']['mlid']]['#title'] = t($title);
         $options[$item['link']['mlid']]['#options'] = dfs_traverse_menu_tree_options($item['below']);
       }
     }
