@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Module file
+ * Module file.
  */
 
 /**
@@ -143,7 +143,7 @@ function site_pages_access_rules($form, &$form_state) {
       '#title' => t('Role'),
       '#options' => array_filter(
         user_roles(),
-        function($val) {
+        function ($val) {
           return ($val != 'administrator');
         }
       ),
@@ -243,12 +243,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
     '#type' => 'checkboxes',
     '#options' => $menu_options,
     '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] :
-      array_map(
-        function() {
-          return 0;
-        },
-        $menu_options
-      ),
+      array_map(function () { return 0; }, $menu_options),
   );
 
   foreach ($menu_options as $key => $value) {
@@ -271,12 +266,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
         '#type' => 'nested_checkboxes',
         '#options' => $options,
         '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] :
-          array_map(
-            function() {
-              return 0;
-            },
-            $options
-          ),
+          array_map(function () { return 0; }, $options),
       );
     }
   }
@@ -300,6 +290,11 @@ function site_pages_access_menus_admin($form, &$form_state) {
 
 /**
  * Form.
+ *
+ * @param $form
+ * @param $form_state
+ *
+ * @return mixed
  */
 function site_pages_access_table_admin($form, &$form_state) {
 
@@ -342,7 +337,7 @@ function site_pages_access_table_admin($form, &$form_state) {
       $sliced_limited_access_pages = array_slice($limited_access_pages, 1);
       array_walk_recursive(
         $sliced_limited_access_pages,
-        function($v, $k) use (&$flatern_limited_access_pages) {
+        function ($v, $k) use (&$flatern_limited_access_pages) {
 
           $flatern_limited_access_pages[] = $v;
         }
@@ -369,7 +364,7 @@ function site_pages_access_table_admin($form, &$form_state) {
           '#attributes' => array(
             'class' => array(
               'edit-site-pages-access-table',
-            )
+            ),
           ),
           '#states' => array(
             'checked' => array(
@@ -395,6 +390,7 @@ function site_pages_access_table_admin($form, &$form_state) {
 
 /**
  * Clear cache.
+ *
  * @param $form
  * @param $form_state
  */
@@ -405,7 +401,9 @@ function _clear_menu_cache(&$form, &$form_state) {
 
 /**
  * Builds a menu tree by depth first search recursive traversal.
+ *
  * @param $tree
+ *
  * @return array
  */
 function dfs_traverse_menu_tree_options($tree) {
@@ -428,6 +426,7 @@ function dfs_traverse_menu_tree_options($tree) {
 
 /**
  * Implements hook_menu_get_item_alter().
+ *
  * @param $router_item
  * @param $path
  * @param $original_map
@@ -464,10 +463,13 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
           foreach ($rules as $rule_type => $value) {
             switch ($rule_type) {
               case 'role':
-                $bypass_aggr[$rule_type] = key_exists($value, $user->roles);
+                $bypass_aggr[$rule_type] = array_key_exists($value, $user->roles);
                 break;
+
               default:
                 drupal_alter('site_pages_access_rule_type', $bypass_aggr[$rule_type], $value);
+                break;
+                
             }
           }
 
@@ -496,7 +498,9 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
 /**
  * Not zero.
+ *
  * @param $val
+ *
  * @return bool
  */
 function _not_zero($val) {
@@ -506,7 +510,9 @@ function _not_zero($val) {
 
 /**
  * Not null.
+ *
  * @param $val
+ *
  * @return bool
  */
 function _not_null($val) {
@@ -515,9 +521,12 @@ function _not_null($val) {
 }
 
 /**
- * Recursive traversal over multidimensional array while dropping empty values an sub-arrays.
+ * Recursive traversal over multidimensional array while dropping empty values
+ * an sub-arrays.
+ *
  * @param $array
  * @param null $callback
+ *
  * @return mixed
  */
 function array_filter_recursive($array, $callback = NULL) {
@@ -546,6 +555,7 @@ function array_filter_recursive($array, $callback = NULL) {
 
 /**
  * Update rules.
+ *
  * @param $form
  * @param $form_state
  */

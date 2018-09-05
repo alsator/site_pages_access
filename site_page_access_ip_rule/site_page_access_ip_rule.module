@@ -14,6 +14,10 @@ function site_page_access_ip_rule_rules_types_options_alter(&$rules_types_option
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
+ * @param $form
+ * @param $form_state
+ * @param $form_id
  */
 function site_page_access_ip_rule_form_site_pages_access_rules_alter(&$form, &$form_state, $form_id) {
 
@@ -42,24 +46,29 @@ function site_page_access_ip_rule_form_site_pages_access_rules_alter(&$form, &$f
 
 /**
  * Returns either ip is in range.
+ *
  * @param $ip
  * @param $min
  * @param $max
+ *
  * @return bool
  */
-function CheckIpRange($ip, $min, $max) {
+function check_ip_range($ip, $min, $max) {
   return (ip2long($min) <= ip2long($ip) && ip2long($ip) <= ip2long($max));
 }
 
 /**
  * Implements hook_site_pages_access_rule_type_alter().
+ *
+ * @param $bypass
+ * @param $ip_range
  */
 function site_page_access_ip_rule_site_pages_access_rule_type_alter(&$bypass, $ip_range) {
 
   $ip_address = ip_address();
 
   $bypass =
-    CheckIpRange(
+    check_ip_range(
       $ip_address,
       $ip_range['ip_range_start'],
       isset($ip_range['ip_range_end']) ? $ip_range['ip_range_end'] : $ip_range['ip_range_start']
