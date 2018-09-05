@@ -1,5 +1,4 @@
 name = Site pages access ip rule
-version = 7.x-1.0
 core = 7.x
 pakage = Site pages acccess
 dependencies[] = site_pages_access

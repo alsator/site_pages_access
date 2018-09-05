@@ -5,13 +5,11 @@
  */
 function site_pages_access_help($path, $arg) {
 
-  switch($path) {
+  switch ($path) {
     case 'admin/help#site_pages_access':
       return check_markup(file_get_contents(dirname(__FILE__) . "/README.txt"));
   }
 }
-
-
 
 /**
  * Implements hook_menu()
@@ -54,15 +52,13 @@ function site_pages_access_menu() {
   return $items;
 }
 
-
-
 /**
  * Implements hook_permission().
  */
 function site_pages_access_permission() {
 
   $items = [];
-  foreach(menu_get_menus() as $key => $value) {
+  foreach (menu_get_menus() as $key => $value) {
     $items['administer ' . $key . ' site_pages_access_menus configuration'] = array(
       'title' => t('Site pages access ' . $value . '  menu')
     );
@@ -71,8 +67,6 @@ function site_pages_access_permission() {
   return $items;
 }
 
-
-
 /**
  * Implements hook_form().
  */
@@ -80,35 +74,35 @@ function site_pages_access_rules($form, &$form_state) {
 
   $form['site_pages_access_rules'] = array(
     '#type' => 'fieldset',
-    '#tree' => true,
+    '#tree' => TRUE,
     '#title' => t('Rules'),
     "#prefix" => '<div id="site-page-access-rules-wrapper">',
     "#suffix" => '</div>',
   );
 
-  if(!isset($form_state['num_rules'])) {
+  if (!isset($form_state['num_rules'])) {
 
     $rules = variable_get('site_pages_access_rules', '');
 
-    if(($num_rules = count($rules)) > 1) {
+    if (($num_rules = count($rules)) > 1) {
       $form_state['num_rules'] = $num_rules;
     }
-    elseif(empty($form_state['num_rules'])) {
+    elseif (empty($form_state['num_rules'])) {
       $form_state['num_rules'] = 1;
     }
 
   }
 
-  for($i = 1; $i <= $form_state['num_rules']; $i++) {
+  for ($i = 1; $i <= $form_state['num_rules']; $i++) {
     $form['site_pages_access_rules'][$i] = array(
       '#type' => 'fieldset',
       '#title' => t('Rule') . ' ' . $i,
-      '#collapsible' => true,
+      '#collapsible' => TRUE,
     );
     $form['site_pages_access_rules'][$i]['availibility'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enabled'),
-      '#default_value' => is_array($rules) ? $rules[$i]['availibility'] : true,
+      '#default_value' => is_array($rules) ? $rules[$i]['availibility'] : TRUE,
     );
     $form['site_pages_access_rules'][$i]['title'] = array(
       '#type' => 'textfield',
@@ -116,10 +110,10 @@ function site_pages_access_rules($form, &$form_state) {
       '#default_value' => is_array($rules) ? $rules[$i]['title'] : 'Rule ' . $i,
       '#states' => array(
         'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE)
         ),
         'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE)
         ),
       )
     );
@@ -132,10 +126,10 @@ function site_pages_access_rules($form, &$form_state) {
       '#default_value' => is_array($rules) ? $rules[$i]['rules'] : array(),
       '#states' => array(
         'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE)
         ),
         'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE)
         ),
       )
     );
@@ -146,13 +140,13 @@ function site_pages_access_rules($form, &$form_state) {
       '#default_value' => is_array($rules) ? $rules[$i]['role'] : '',
       '#states' => array(
         'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE)
         ),
         'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE)
         ),
         'visible' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][rules][role]"]' => array('checked' => true)
+          ':input[name="site_pages_access_rules[' . $i . '][rules][role]"]' => array('checked' => TRUE)
         )
       )
     );
@@ -168,7 +162,7 @@ function site_pages_access_rules($form, &$form_state) {
     ),
   );
 
-  if($form_state['num_rules'] > 1) {
+  if ($form_state['num_rules'] > 1) {
     $form['site_pages_access_rules']['remove_rule'] = array(
       '#type' => 'submit',
       '#value' => t('Remove latest rule'),
@@ -183,36 +177,28 @@ function site_pages_access_rules($form, &$form_state) {
   return system_settings_form($form);
 }
 
-
-
 function add_rule($form, &$form_state) {
 
-  if(!isset($form_state['num_rules'])) {
+  if (!isset($form_state['num_rules'])) {
     $form_state['num_rules'] = 0;
     $form_state['num_rules']++;
   }
   $form_state['num_rules']++;
-  $form_state['rebuild'] = true;
+  $form_state['rebuild'] = TRUE;
 }
-
-
 
 function add_remove_rule_callback($form, $form_state) {
 
   return $form['site_pages_access_rules'];
 }
 
-
-
 function remove_rule($form, &$form_state) {
 
-  if($form_state['num_rules'] > 1) {
+  if ($form_state['num_rules'] > 1) {
     $form_state['num_rules']--;
   }
-  $form_state['rebuild'] = true;
+  $form_state['rebuild'] = TRUE;
 }
-
-
 
 /**
  * Implements hook_form().
@@ -220,15 +206,15 @@ function remove_rule($form, &$form_state) {
 function site_pages_access_menus_admin($form, &$form_state) {
 
   $form['site_pages_access_menus'] = array(
-    '#tree' => true,
+    '#tree' => TRUE,
     '#type' => 'fieldset',
     '#title' => t('Menus'),
   );
 
   $menu_options = menu_get_menus();
 
-  foreach($menu_options as $key => $value) {
-    if(!user_access('administer ' . $key . ' site_pages_access_menus configuration')) {
+  foreach ($menu_options as $key => $value) {
+    if (!user_access('administer ' . $key . ' site_pages_access_menus configuration')) {
       unset($menu_options[$key]);
     }
   }
@@ -240,12 +226,12 @@ function site_pages_access_menus_admin($form, &$form_state) {
     '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] : array_map(function() { return 0; }, $menu_options),
   );
 
-  foreach($menu_options as $key => $value) {
+  foreach ($menu_options as $key => $value) {
 
     $tree = menu_tree_all_data($key);
     $options = dfs_traverse_menu_tree_options($tree);
 
-    if(count($options) > 0) {
+    if (count($options) > 0) {
 
       $form['site_pages_access_menus']['site_pages_access_menu_' . $key . '_items'] = array(
         '#type' => 'fieldset',
@@ -281,11 +267,9 @@ function site_pages_access_menus_admin($form, &$form_state) {
   return system_settings_form($form);
 }
 
-
-
 function site_pages_access_table_admin($form, &$form_state) {
 
-  $form['#tree'] = true;
+  $form['#tree'] = TRUE;
 
   $form['site_pages_access_rules_behaviour_politics'] = array(
     '#type' => 'radios',
@@ -298,13 +282,13 @@ function site_pages_access_table_admin($form, &$form_state) {
 
   $rules = variable_get('site_pages_access_rules', '');
 
-  foreach($rules as $key => $rule) {
-    if(!$rule['availibility']) {
+  foreach ($rules as $key => $rule) {
+    if (!$rule['availibility']) {
       unset($rules[$key]);
     }
   }
 
-  if(!empty($rules)) {
+  if (!empty($rules)) {
 
     $rules_options = array_column($rules, 'title');
     $rules_options = array_combine($rules_options, $rules_options);
@@ -313,7 +297,7 @@ function site_pages_access_table_admin($form, &$form_state) {
 
     $site_pages_access_tables = variable_get('site_pages_access_table', '');
 
-    foreach($limited_access_pages['menus'] as $menu_name) {
+    foreach ($limited_access_pages['menus'] as $menu_name) {
       $menu = menu_load($menu_name);
       $form['site_pages_access_table'][$menu_name] = array(
         '#type' => 'fieldset',
@@ -330,12 +314,12 @@ function site_pages_access_table_admin($form, &$form_state) {
         }
       );
 
-      foreach($flatern_limited_access_pages as $mlid) {
+      foreach ($flatern_limited_access_pages as $mlid) {
         $link = menu_link_load($mlid);
 
         $path = [];
-        for($i = 1; $i <= 9; $i++) {
-          if($link['p' . $i] != 0 && $link['p' . $i] != $link['mlid']) {
+        for ($i = 1; $i <= 9; $i++) {
+          if ($link['p' . $i] != 0 && $link['p' . $i] != $link['mlid']) {
             $path[] = menu_link_load($link['p' . $i])['link_title'];
           }
         }
@@ -375,14 +359,10 @@ function site_pages_access_table_admin($form, &$form_state) {
   return system_settings_form($form);
 }
 
-
-
 function _clear_menu_cache(&$form, &$form_state) {
 
-  cache_clear_all(null, 'cache_menu');
+  cache_clear_all(NULL, 'cache_menu');
 }
-
-
 
 /**
  * Builds a menu tree by depth first search recursive traversal
@@ -390,9 +370,9 @@ function _clear_menu_cache(&$form, &$form_state) {
 function dfs_traverse_menu_tree_options($tree) {
 
   $options = [];
-  foreach($tree as $item) {
-    if(!$item['link']['hidden']) {
-      if(count($item['below']) == 0) {
+  foreach ($tree as $item) {
+    if (!$item['link']['hidden']) {
+      if (count($item['below']) == 0) {
         $options[$item['link']['mlid']] = strip_tags($item['link']['link_title']);
       }
       else {
@@ -405,8 +385,6 @@ function dfs_traverse_menu_tree_options($tree) {
   return $options;
 }
 
-
-
 /**
  * Implements hook_menu_get_item_alter().
  * @param $router_item
@@ -417,17 +395,17 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
   global $user;
 
-  $bypass = false;
+  $bypass = FALSE;
 
-  if(user_access('administer site configuration', $user)) {
-    $bypass = true;
+  if (user_access('administer site configuration', $user)) {
+    $bypass = TRUE;
   }
   else {
 
     $flatern_pages_rules = variable_get('site_pages_access_flatern_pages_rules', '');
 
-    if($flatern_pages_rules == '') {
-      $bypass = true;
+    if ($flatern_pages_rules == '') {
+      $bypass = TRUE;
     }
     else {
 
@@ -437,13 +415,13 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
         ->execute()
         ->fetchField();
 
-      if(isset($flatern_pages_rules[$mlid])) {
+      if (isset($flatern_pages_rules[$mlid])) {
 
         $bypass_aggr = [];
-        foreach($flatern_pages_rules[$mlid] as $rule_title => $rules) {
+        foreach ($flatern_pages_rules[$mlid] as $rule_title => $rules) {
 
-          foreach($rules as $rule_type => $value) {
-            switch($rule_type) {
+          foreach ($rules as $rule_type => $value) {
+            switch ($rule_type) {
               case 'role':
                 $bypass_aggr[$rule_type] = key_exists($value, $user->roles);
                 break;
@@ -454,20 +432,20 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
         }
 
-        if(count(array_unique($bypass_aggr)) === 1) {
-          $bypass = true;
+        if (in_array(FALSE, array_unique($bypass_aggr)) === 1) {
+          $bypass = FALSE;
         }
 
       }
       else {
-        $bypass = true;
+        $bypass = TRUE;
       }
 
     }
 
   }
 
-  if(!$bypass) {
+  if (!$bypass) {
     $original_router_item_access_callback = $router_item['access_callback'];
     $router_item['access_callback'] = '';
     drupal_alter('site_pages_access_deny_callback', $router_item, $path, $original_map, $original_router_item_access_callback);
@@ -475,21 +453,15 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
 }
 
-
-
 function _not_zero($val) {
 
   return ($val != '0' && $val != '0');
 }
 
-
-
 function _not_null($val) {
 
-  return ($val != null && $val != null);
+  return ($val != NULL && $val != NULL);
 }
-
-
 
 /**
  * Recursive traversal over multidimensional array while dropping empty values an sub-arrays
@@ -497,20 +469,20 @@ function _not_null($val) {
  * @param null $callback
  * @return mixed
  */
-function array_filter_recursive($array, $callback = null) {
+function array_filter_recursive($array, $callback = NULL) {
 
-  foreach($array as $key => & $value) {
-    if(is_array($value)) {
+  foreach ($array as $key => & $value) {
+    if (is_array($value)) {
       $value = array_filter_recursive($value, $callback);
     }
     else {
-      if(!is_null($callback)) {
-        if(!call_user_func($callback, $value)) {
+      if (!is_null($callback)) {
+        if (!call_user_func($callback, $value)) {
           unset($array[$key]);
         }
       }
       else {
-        if(!(bool)$value) {
+        if (!(bool)$value) {
           unset($array[$key]);
         }
       }
@@ -521,8 +493,6 @@ function array_filter_recursive($array, $callback = null) {
   return $array;
 }
 
-
-
 function _mlid_by_path($path) {
 
   return db_select('menu_links', 'ml')
@@ -532,23 +502,19 @@ function _mlid_by_path($path) {
     ->fetchField();
 }
 
-
-
-function _verify_path_role_bypass($path, $role, $user = null) {
+function _verify_path_role_bypass($path, $role, $user = NULL) {
 
   $mlid = _mlid_by_path($path);
 }
-
-
 
 function _update_bypass_link_rules_table($form, &$form_state) {
 
   $pages_rules = $form_state['input']['site_pages_access_table'];
 
-  foreach($pages_rules as $menu_name => $mlids) {
-    foreach($mlids as $mlid => $rules) {
-      foreach($rules as $key => $value) {
-        if($value === null || $key !== $value) {
+  foreach ($pages_rules as $menu_name => $mlids) {
+    foreach ($mlids as $mlid => $rules) {
+      foreach ($rules as $key => $value) {
+        if ($value === NULL || $key !== $value) {
           unset($pages_rules[$menu_name][$mlid][$key]);
         }
       }
@@ -558,20 +524,20 @@ function _update_bypass_link_rules_table($form, &$form_state) {
   $rules = variable_get('site_pages_access_rules', '');
 
   $flatern_pages_rules = [];
-  foreach($pages_rules as $menu) {
-    foreach($menu as $mlid => $page_rules) {
+  foreach ($pages_rules as $menu) {
+    foreach ($menu as $mlid => $page_rules) {
       $flatern_pages_rules[$mlid] = $page_rules;
     }
   }
 
   $new_flatern_pages_rules = [];
-  foreach($rules as $rule) {
-    foreach($flatern_pages_rules as $mlid => $rs) {
-      if(!empty($flatern_pages_rules[$mlid])) {
-        foreach($rs as $key => $val) {
-          if($rule['title'] == $key) {
-            foreach($rule['rules'] as $type => $isset) {
-              if($isset) {
+  foreach ($rules as $rule) {
+    foreach ($flatern_pages_rules as $mlid => $rs) {
+      if (!empty($flatern_pages_rules[$mlid])) {
+        foreach ($rs as $key => $val) {
+          if ($rule['title'] == $key) {
+            foreach ($rule['rules'] as $type => $isset) {
+              if ($isset) {
                 $new_flatern_pages_rules[$mlid][$key][$type] = $rule[$type];
               }
             }

@@ -2,6 +2,5 @@ name = Site pages access
 core = 7.x
 pakage = Site pages acccess
 description = Allows to manage access to each page of site
-version = 7.x-2.0
 configure = admin/config/site_pages_access
 dependencies[] = nested_checkbox
