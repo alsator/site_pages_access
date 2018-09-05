@@ -27,4 +27,6 @@ Policy of accessibility to blocked pages (administrator is allways availible):
 hook_site_pages_access_deny_validate_alter(&$bypass)
 
 Actions to do on attempt to access to not allowed pages:
-hook_site_pages_access_deny_callback_alter(&$router_item, $path, $original_map, $original_router_item_access_callback)
+hook_site_pages_access_deny_callback_alter(
+  &$router_item, $path, $original_map, $original_router_item_access_callback
+)

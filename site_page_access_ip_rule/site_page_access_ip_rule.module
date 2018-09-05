@@ -1,13 +1,15 @@
 <?php
 
 /**
+ * Module file.
+ */
+
+/**
  * Implements hook_rules_types_options_alter().
  */
 function site_page_access_ip_rule_rules_types_options_alter(&$rules_types_options) {
   $rules_types_options['ip'] = 'IP';
 }
-
-
 
 /**
  * Implements hook_form_FORM_ID_alter().
@@ -16,7 +18,7 @@ function site_page_access_ip_rule_form_site_pages_access_rules_alter(&$form, &$f
 
   $rules = variable_get('site_pages_access_rules', '');
 
-  for($i = 1; $i <= $form_state['num_rules']; $i++) {
+  for ($i = 1; $i <= $form_state['num_rules']; $i++) {
 
     $form['site_pages_access_rules'][$i]['ip'] = array(
       '#type' => 'ipv4_address_range_field',
@@ -24,26 +26,29 @@ function site_page_access_ip_rule_form_site_pages_access_rules_alter(&$form, &$f
       '#default_value' => is_array($rules) ? $rules[$i]['ip']['ip_range_start'] . ' - ' . $rules[$i]['ip']['ip_range_end'] : '',
       '#states' => array(
         'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => true)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE),
         ),
         'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => false)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE),
         ),
         'visible' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => true)
-        )
-      )
+          ':input[name="site_pages_access_rules[' . $i . '][rules][ip]"]' => array('checked' => TRUE),
+        ),
+      ),
     );
   }
 }
 
-
-
+/**
+ * Returns either ip is in range.
+ * @param $ip
+ * @param $min
+ * @param $max
+ * @return bool
+ */
 function CheckIpRange($ip, $min, $max) {
   return (ip2long($min) <= ip2long($ip) && ip2long($ip) <= ip2long($max));
 }
-
-
 
 /**
  * Implements hook_site_pages_access_rule_type_alter().

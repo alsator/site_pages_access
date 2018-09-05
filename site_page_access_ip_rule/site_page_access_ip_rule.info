@@ -1,4 +1,5 @@
 name = Site pages access ip rule
+name = Adds ip rule to site pages access module
 core = 7.x
 pakage = Site pages acccess
 dependencies[] = site_pages_access

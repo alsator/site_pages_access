@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * module file
+ */
+
+/**
  * Implements hook_help().
  */
 function site_pages_access_help($path, $arg) {
@@ -12,7 +16,7 @@ function site_pages_access_help($path, $arg) {
 }
 
 /**
- * Implements hook_menu()
+ * Implements hook_menu().
  */
 function site_pages_access_menu() {
 
@@ -60,7 +64,7 @@ function site_pages_access_permission() {
   $items = [];
   foreach (menu_get_menus() as $key => $value) {
     $items['administer ' . $key . ' site_pages_access_menus configuration'] = array(
-      'title' => t('Site pages access ' . $value . '  menu')
+      'title' => 'Site pages access ' . $value . ' menu',
     );
   }
 
@@ -110,12 +114,12 @@ function site_pages_access_rules($form, &$form_state) {
       '#default_value' => is_array($rules) ? $rules[$i]['title'] : 'Rule ' . $i,
       '#states' => array(
         'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE),
         ),
         'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE),
         ),
-      )
+      ),
     );
     $rules_types_options = array('role' => 'Role');
     drupal_alter('rules_types_options', $rules_types_options);
@@ -126,12 +130,12 @@ function site_pages_access_rules($form, &$form_state) {
       '#default_value' => is_array($rules) ? $rules[$i]['rules'] : array(),
       '#states' => array(
         'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE),
         ),
         'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE),
         ),
-      )
+      ),
     );
     $form['site_pages_access_rules'][$i]['role'] = array(
       '#type' => 'select',
@@ -140,15 +144,15 @@ function site_pages_access_rules($form, &$form_state) {
       '#default_value' => is_array($rules) ? $rules[$i]['role'] : '',
       '#states' => array(
         'enabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => TRUE),
         ),
         'disabled' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE)
+          ':input[name="site_pages_access_rules[' . $i . '][availibility]"]' => array('checked' => FALSE),
         ),
         'visible' => array(
-          ':input[name="site_pages_access_rules[' . $i . '][rules][role]"]' => array('checked' => TRUE)
-        )
-      )
+          ':input[name="site_pages_access_rules[' . $i . '][rules][role]"]' => array('checked' => TRUE),
+        ),
+      ),
     );
   }
 
@@ -177,6 +181,9 @@ function site_pages_access_rules($form, &$form_state) {
   return system_settings_form($form);
 }
 
+/**
+ * AJAX add.
+ */
 function add_rule($form, &$form_state) {
 
   if (!isset($form_state['num_rules'])) {
@@ -187,11 +194,17 @@ function add_rule($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
+/*
+ * AJAX add/remove callback
+ */
 function add_remove_rule_callback($form, $form_state) {
 
   return $form['site_pages_access_rules'];
 }
 
+/**
+ * AJAX remove.
+ */
 function remove_rule($form, &$form_state) {
 
   if ($form_state['num_rules'] > 1) {
@@ -238,8 +251,8 @@ function site_pages_access_menus_admin($form, &$form_state) {
         '#title' => $value,
         '#attributes' => array(
           'class' => array('menu-wrapper menu'),
-          'id' => $key
-        )
+          'id' => $key,
+        ),
       );
 
       $form['site_pages_access_menus']['site_pages_access_menu_' . $key . '_items']['blocked_items'] = array(
@@ -252,7 +265,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
 
   $form['#attached']['js'][] = array(
     'data' => drupal_get_path('module', 'site_pages_access') . '/js/hide_show_menus.js',
-    'type' => 'file'
+    'type' => 'file',
   );
 
   $form['#attached']['css'][] = array(
@@ -267,6 +280,9 @@ function site_pages_access_menus_admin($form, &$form_state) {
   return system_settings_form($form);
 }
 
+/**
+ * Form.
+ */
 function site_pages_access_table_admin($form, &$form_state) {
 
   $form['#tree'] = TRUE;
@@ -275,7 +291,7 @@ function site_pages_access_table_admin($form, &$form_state) {
     '#type' => 'radios',
     '#options' => array(
       'site_wild' => t('Common behaviour for all limited access pages (all the options will be enabled)'),
-      'per_page' => t('Different behaviour for each limited access page')
+      'per_page' => t('Different behaviour for each limited access page'),
     ),
     '#default_value' => variable_get('site_pages_access_rules_behaviour_politics', 'site_wild'),
   );
@@ -334,14 +350,14 @@ function site_pages_access_table_admin($form, &$form_state) {
           '#default_value' => $default_value,
           '#attributes' => array(
             'class' => array(
-              'edit-site-pages-access-table'
+              'edit-site-pages-access-table',
             )
           ),
           '#states' => array(
             'checked' => array(
-              ':input[name="site_pages_access_rules_behaviour_politics"]' => array('value' => 'site_wild')
-            )
-          )
+              ':input[name="site_pages_access_rules_behaviour_politics"]' => array('value' => 'site_wild'),
+            ),
+          ),
         );
       }
 
@@ -350,7 +366,7 @@ function site_pages_access_table_admin($form, &$form_state) {
 
   $form['#attached']['js'][] = array(
     'data' => drupal_get_path('module', 'site_pages_access') . '/js/rules_behaviour_politics.js',
-    'type' => 'file'
+    'type' => 'file',
   );
 
   $form['#submit'][] = '_update_bypass_link_rules_table';
@@ -359,6 +375,11 @@ function site_pages_access_table_admin($form, &$form_state) {
   return system_settings_form($form);
 }
 
+/**
+ * Clear cache.
+ * @param $form
+ * @param $form_state
+ */
 function _clear_menu_cache(&$form, &$form_state) {
 
   cache_clear_all(NULL, 'cache_menu');
@@ -432,7 +453,7 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
         }
 
-        if (in_array(FALSE, array_unique($bypass_aggr)) === 1) {
+        if (in_array(FALSE, array_unique($bypass_aggr))) {
           $bypass = FALSE;
         }
 
@@ -453,11 +474,21 @@ function site_pages_access_menu_get_item_alter(&$router_item, $path, $original_m
 
 }
 
+/**
+ * Not zero.
+ * @param $val
+ * @return bool
+ */
 function _not_zero($val) {
 
   return ($val != '0' && $val != '0');
 }
 
+/**
+ * Not null.
+ * @param $val
+ * @return bool
+ */
 function _not_null($val) {
 
   return ($val != NULL && $val != NULL);
@@ -493,20 +524,11 @@ function array_filter_recursive($array, $callback = NULL) {
   return $array;
 }
 
-function _mlid_by_path($path) {
-
-  return db_select('menu_links', 'ml')
-    ->fields('ml', array('mlid'))
-    ->condition('link_path', $path)
-    ->execute()
-    ->fetchField();
-}
-
-function _verify_path_role_bypass($path, $role, $user = NULL) {
-
-  $mlid = _mlid_by_path($path);
-}
-
+/**
+ * Update rules
+ * @param $form
+ * @param $form_state
+ */
 function _update_bypass_link_rules_table($form, &$form_state) {
 
   $pages_rules = $form_state['input']['site_pages_access_table'];
