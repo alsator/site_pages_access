@@ -1,7 +1,8 @@
 <?php
 
 /**
- * module file
+ * @file
+ * Module file
  */
 
 /**
@@ -140,7 +141,12 @@ function site_pages_access_rules($form, &$form_state) {
     $form['site_pages_access_rules'][$i]['role'] = array(
       '#type' => 'select',
       '#title' => t('Role'),
-      '#options' => array_filter(user_roles(), function($val) { return ($val != 'administrator'); }),
+      '#options' => array_filter(
+        user_roles(),
+        function($val) {
+          return ($val != 'administrator');
+        }
+      ),
       '#default_value' => is_array($rules) ? $rules[$i]['role'] : '',
       '#states' => array(
         'enabled' => array(
@@ -194,8 +200,8 @@ function add_rule($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
-/*
- * AJAX add/remove callback
+/**
+ * AJAX add/remove callback.
  */
 function add_remove_rule_callback($form, $form_state) {
 
@@ -236,7 +242,13 @@ function site_pages_access_menus_admin($form, &$form_state) {
     '#title' => t('Choose an availible menus'),
     '#type' => 'checkboxes',
     '#options' => $menu_options,
-    '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] : array_map(function() { return 0; }, $menu_options),
+    '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] :
+      array_map(
+        function() {
+          return 0;
+        },
+        $menu_options
+      ),
   );
 
   foreach ($menu_options as $key => $value) {
@@ -258,7 +270,13 @@ function site_pages_access_menus_admin($form, &$form_state) {
       $form['site_pages_access_menus']['site_pages_access_menu_' . $key . '_items']['blocked_items'] = array(
         '#type' => 'nested_checkboxes',
         '#options' => $options,
-        '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] : array_map(function() { return 0; }, $options),
+        '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] :
+          array_map(
+            function() {
+              return 0;
+            },
+            $options
+          ),
       );
     }
   }
@@ -386,7 +404,9 @@ function _clear_menu_cache(&$form, &$form_state) {
 }
 
 /**
- * Builds a menu tree by depth first search recursive traversal
+ * Builds a menu tree by depth first search recursive traversal.
+ * @param $tree
+ * @return array
  */
 function dfs_traverse_menu_tree_options($tree) {
 
@@ -495,7 +515,7 @@ function _not_null($val) {
 }
 
 /**
- * Recursive traversal over multidimensional array while dropping empty values an sub-arrays
+ * Recursive traversal over multidimensional array while dropping empty values an sub-arrays.
  * @param $array
  * @param null $callback
  * @return mixed
@@ -525,7 +545,7 @@ function array_filter_recursive($array, $callback = NULL) {
 }
 
 /**
- * Update rules
+ * Update rules.
  * @param $form
  * @param $form_state
  */

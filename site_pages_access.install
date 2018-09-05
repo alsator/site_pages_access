@@ -1,7 +1,8 @@
 <?php
 
 /**
- * module.install file
+ * @file
+ * Install file
  */
 
 /**
