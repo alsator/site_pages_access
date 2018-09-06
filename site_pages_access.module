@@ -63,9 +63,14 @@ function site_pages_access_menu() {
 function site_pages_access_permission() {
 
   $items = [];
+
+  $items['administer site_pages_access_menus configuration'] = array(
+    'title' => 'Administer site pages access configuration',
+  );
+
   foreach (menu_get_menus() as $key => $value) {
     $items['administer ' . $key . ' site_pages_access_menus configuration'] = array(
-      'title' => 'Site pages access ' . $value . ' menu',
+      'title' => 'Block items of ' . $value . ' menu',
     );
   }
 
