@@ -144,6 +144,7 @@ function site_pages_access_rules($form, &$form_state) {
       '#options' => array_filter(
         user_roles(),
         function ($val) {
+
           return ($val != 'administrator');
         }
       ),
@@ -242,8 +243,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
     '#title' => t('Choose an availible menus'),
     '#type' => 'checkboxes',
     '#options' => $menu_options,
-    '#default_value' =>
-      is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] : array_map(function () { return 0; }, $menu_options),
+    '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['menus'] : array_map(function () { return 0; }, $menu_options),
   );
 
   foreach ($menu_options as $key => $value) {
@@ -265,8 +265,7 @@ function site_pages_access_menus_admin($form, &$form_state) {
       $form['site_pages_access_menus']['site_pages_access_menu_' . $key . '_items']['blocked_items'] = array(
         '#type' => 'nested_checkboxes',
         '#options' => $options,
-        '#default_value' =>
-          is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] : array_map(function () { return 0; }, $options),
+        '#default_value' => is_array(variable_get('site_pages_access_menus', '')) ? variable_get('site_pages_access_menus', '')['site_pages_access_menu_' . $key . '_items']['blocked_items'] : array_map(function () { return 0; }, $options),
       );
     }
   }
